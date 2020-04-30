@@ -1,16 +1,20 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { StyleSheet, View, Text, Image, TextInput } from 'react-native';
-import { Auth } from '../Config/Config'
+import { StyleSheet, View, Text, Image, TextInput, Modal, TouchableHighlight } from 'react-native';
+// import { Auth } from '../Config/Config'
+import auth from '@react-native-firebase/auth';
+
 import Images from '../assets/index'
-export default function Login() {
+export default function Login({ navigation }) {
 
     const [PhoneNumber, setPhoneNumber] = useState()
     const [confirm, setConfirm] = useState(null)
     const [code, setCode] = useState('');
-
+    const [modalVisible, setModalVisible] = useState(false);
+    const [resendModal, setVisible] = useState(false)
     const [sendingOTP, setSendingOTP] = useState(false);
     const [timeLeft, setTimeLeft] = useState(30);
     const [verifyingOTP, setVerifyingOTP] = useState(false);
+    const [result, setResult] = useState('')
     const intervalRef = useRef(null);
     const startTimer = useCallback(() => {
         intervalRef.current = setInterval(() => {
@@ -24,23 +28,40 @@ export default function Login() {
             clearInterval(intervalRef.current);
         };
     }, []);
-    var appVerifier = window.recaptchaVerifier;
+
+    const validatePhoneNumber = (phoneNumber) => {
+        var regexp = /^((\+){1}91){1}[1-9]{1}[0-9]{9}$/
+        return regexp.test(phoneNumber)
+    }
 
     const handleSubmit = useCallback(
         async phoneNumber => {
-            const confirmation = await Auth.signInWithPhoneNumber(phoneNumber);
-            startTimer();
-            console.log(confirmation)
-            setConfirm(confirmation);
+            if (validatePhoneNumber(phoneNumber) == '') {
+                setResult('Enter valid Phone Number')
+            }
+            else {
+                const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
+                startTimer();
+                setConfirm(confirmation);
+            }
         },
         [startTimer],
     );
 
     async function confirmCode() {
-        try {
-            await confirm.confirm(code);
-        } catch (error) {
-            console.log('Invalid code.');
+        if (code == '') {
+            setModalVisible(true)
+        }
+        else {
+            try {
+                await confirm.confirm(code)
+                if (modalVisible == false) {
+                    navigation.navigate('Signup')
+                }
+            } catch (error) {
+                setModalVisible(true);
+                console.log('Invalid code.');
+            }
         }
     }
 
@@ -55,10 +76,13 @@ export default function Login() {
                     <Text style={styles.text}>Get start with Phone Number</Text>
                     <Text>Please confirm country code and</Text>
                     <Text>enter your Phone Number</Text>
-                    <View style={styles.inputNumber}>
+                    <View style={result ? styles.error : styles.inputNumber}>
                         <Image style={styles.flag} source={Images.india} />
                         <Text style={{ marginTop: 15, marginLeft: 10 }}>+91</Text>
-                        <TextInput style={{ width: 150 }} onChangeText={text => { setPhoneNumber(text) }} />
+                        <TextInput style={{ width: 120, paddingLeft: 10 }} onChangeText={text => {
+                            setResult('')
+                            setPhoneNumber(text)
+                        }} />
                         <Text style={styles.submit} onPress={() => {
                             handleSubmit('+91' + PhoneNumber)
                             setSendingOTP(true);
@@ -66,13 +90,54 @@ export default function Login() {
                             <Image style={{ height: 30, width: 30 }} source={Images.tick} />
                         </Text>
                     </View>
+                    <Text style={styles.result}>{result}</Text>
                 </View>
             </View>
         )
     }
     return (
         <View style={styles.container}>
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+            >
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <Text style={{ textAlign: 'center' }}>Alert</Text>
+                        <Text style={styles.modalText}>ENTER VALID OTP</Text>
 
+                        <TouchableHighlight
+                            style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
+                            onPress={() => { setModalVisible(false) }}
+                        >
+                            <Text style={styles.textStyle}>Ok</Text>
+                        </TouchableHighlight>
+                    </View>
+                </View>
+            </Modal>
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={resendModal}
+            >
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <Text style={{ textAlign: 'center' }}>Alert</Text>
+                        <Text style={styles.modalText}>OTP Expired</Text>
+
+                        <TouchableHighlight
+                            style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
+                            onPress={() => {
+                                startTimer()
+                                setVisible(false)
+                            }}
+                        >
+                            <Text style={styles.textStyle}>Resend OTP</Text>
+                        </TouchableHighlight>
+                    </View>
+                </View>
+            </Modal>
             <View style={styles.imageContainer}>
                 <Image style={styles.image} source={Images.login} />
             </View>
@@ -81,15 +146,17 @@ export default function Login() {
                 <Text style={styles.text}>Verify Your Number</Text>
                 <Text>Please enter verification code sent to</Text>
                 <Text>your number</Text>
-                <View style={styles.inputNumber}>
-                    <TextInput style={{ width: 150 }} onChangeText={text => { setCode(text) }} />
-                    <Text style={styles.submit} onPress={() => {
-                        setVerifyingOTP(true);
-                        confirmCode()
-                    }}>
-                        <Image style={{ height: 30, width: 30 }} source={Images.tick} />
-                    </Text>
-                </View>
+
+                <Text style={styles.timer}>{timeLeft}</Text>
+                <Text style={styles.otpsubmit} onPress={() => {
+                    setVerifyingOTP(true);
+                    confirmCode()
+                }}>
+                    <Image style={{ height: 30, width: 30 }} source={Images.tick} />
+                </Text>
+
+                <TextInput style={styles.inputOTP} onChangeText={text => { setCode(text) }} />
+
             </View>
         </View>
     )
@@ -123,6 +190,17 @@ const styles = StyleSheet.create({
         borderBottomColor: '#DDDDDD',
         borderBottomWidth: 1,
     },
+    inputOTP: {
+        borderBottomColor: '#DDDDDD',
+        borderBottomWidth: 1,
+        width: 100,
+        textAlign: 'center'
+    },
+    error: {
+        flexDirection: 'row',
+        borderBottomColor: 'red',
+        borderBottomWidth: 1,
+    },
     flag: {
         height: 25,
         width: 30,
@@ -131,5 +209,63 @@ const styles = StyleSheet.create({
     submit: {
         height: 40,
         width: 40
+    },
+    otpsubmit: {
+        position: 'absolute',
+        top: 80,
+        right: 70,
+        height: 40,
+        width: 40
+    },
+    result: {
+        fontSize: 15,
+        color: 'red'
+    },
+    modalView: {
+        margin: 20,
+        marginTop: 230,
+        backgroundColor: "white",
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 20,
+        padding: 35,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 3
+    },
+    openButton: {
+        backgroundColor: "#F194FF",
+        borderRadius: 20,
+        padding: 10,
+        width: 150,
+        elevation: 2,
+    },
+    textStyle: {
+        color: "white",
+        fontWeight: "bold",
+        textAlign: "center"
+    },
+    modalText: {
+        fontSize: 15,
+        marginBottom: 10,
+        textAlign: 'center'
+    },
+    timer: {
+        position: 'absolute',
+        top: 70,
+        left: 70,
+        marginTop: 15,
+        borderRadius: 20,
+        borderWidth: 2,
+        borderColor: 'gray',
+        fontWeight: 'bold',
+        paddingHorizontal: 8,
+        paddingVertical: 6,
+        textAlign: 'center'
     }
 })

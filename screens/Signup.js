@@ -1,171 +1,91 @@
-import React, { useEffect, useState } from 'react'
-import { StyleSheet, Text, View, TextInput, Image, Modal, ImageBackground, TouchableOpacity } from 'react-native';
-import Images from '../assets/index';
-import { Auth } from '../Config/Config'
+import React, { useState } from 'react';
+import { StyleSheet, View, Text, Image, TextInput } from 'react-native';
+
+import Images from '../assets/index'
 
 export default function Signup({ navigation }) {
-
-    const [Email, setEmail] = useState();
-    const [Password, setPassword] = useState();
-    const [result, setResult] = useState()
-    const [visible, setVisible] = useState(true)
-
-    const handleVisibility = e => {
-        setVisible(!visible)
-    }
-
-    const handleLink = e => {
-        navigation.navigate('Login')
-    }
-    const handleSubmit = e => {
-        e.preventDefault();
-
-        if (
-            Email == "" ||
-            Password == ""
-        ) {
-            setResult("Required!");
+    const [name, setName] = useState('')
+    const [result, setResult] = useState('')
+    const handleSubmit = () => {
+        if (name == "") {
+            setResult("required")
         }
         else {
-            Auth
-                .createUserWithEmailAndPassword(Email, Password)
-                .then(() => {
-                    console.log('User account created & signed in!');
-                })
-                .catch(error => {
-                    if (error.code === 'auth/email-already-in-use') {
-                        console.log('That email address is already in use!');
-                    }
-
-                    if (error.code === 'auth/invalid-email') {
-                        console.log('That email address is invalid!');
-                    }
-
-                    console.error(error);
-                });
-
+            navigation.navigate('Contacts')
         }
     }
-
     return (
         <View style={styles.container}>
-            <ImageBackground source={Images.background} style={styles.containerBackground}>
-                <View style={styles.textContainer}>
-                    <Text style={styles.text}>Who are you!</Text>
-                </View>
-                <View style={styles.inputContainer}>
-                    <Text style={{ paddingHorizontal: 15, color: 'red', textAlign: 'right' }}>{result}</Text>
-                    <View style={styles.Inputtext}>
-                        <Image style={styles.image} source={Images.personLogin} />
-                        <TextInput
-                            placeholder="Email"
-                            name="Email"
-                            style={{ paddingBottom: 0 }}
-                            onChangeText={text => {
-                                setEmail(text);
-                            }}
-                        />
-                    </View>
-                    <View style={styles.Inputtext}>
-                        <Image style={styles.image} source={Images.lock} />
 
-                        <TextInput
-                            style={{ paddingBottom: 0 }}
-                            placeholder="Password"
-                            name="Password"
-                            secureTextEntry={visible}
-                            onChangeText={text => {
-                                setPassword(text);
-                            }}
-                        />
-                        <Text style={styles.icon} onPress={handleVisibility}>
-                            <Image style={styles.image} source={visible ? Images.invisible : Images.visible} />
-                        </Text>
-                    </View>
-                    <TouchableOpacity onPress={handleSubmit} style={styles.button}>
-                        <Text style={{ textAlign: 'center' }}>Create Account</Text>
-                    </TouchableOpacity>
+            <View style={styles.imageContainer}>
+                <Image style={styles.image} source={Images.login} />
+            </View>
 
+            <View style={styles.textContainer}>
+                <Text style={styles.text}>SignUp with Chat App</Text>
+                <View style={result ? styles.error : styles.inputNumber}>
+                    <TextInput style={{ width: 120, textAlign: 'center' }} placeholder="Enter your Name" onChangeText={text => {
+                        setResult('')
+
+                        setName(text)
+                    }} />
+                    <Text style={styles.submit} onPress={() => {
+                        handleSubmit()
+                    }}>
+                        <Image style={{ height: 30, width: 30 }} source={Images.tick} />
+                    </Text>
                 </View>
-                <View style={styles.buttonContainer}>
-                    <Text onPress={handleLink} style={styles.forgot} >Already have an Account!</Text>
-                </View>
-            </ImageBackground>
+                <Text style={styles.result}>{result}</Text>
+            </View>
+
         </View>
-    );
+    )
 }
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
         justifyContent: 'space-evenly'
     },
-    containerBackground: {
+    image: {
+        height: 250,
+        width: 250
+    },
+    imageContainer: {
         flex: 1,
+        alignItems: "center",
+        justifyContent: "center"
     },
     textContainer: {
         flex: 2,
         alignItems: 'center',
-        justifyContent: 'space-around',
-    },
-    inputContainer: {
-        flex: 4,
-        alignContent: 'center',
-        justifyContent: 'flex-end',
-    },
-    buttonContainer: {
-        flex: 1,
-        alignItems: 'flex-end',
-        justifyContent: 'flex-start',
+        justifyContent: "flex-start",
     },
     text: {
-        borderColor: 'black',
-        borderRadius: 5,
-        borderWidth: 3,
-        borderTopWidth: 2.5,
-        paddingHorizontal: 20,
-        paddingVertical: 7,
-        fontFamily: 'sans-serif-medium',
-        fontSize: 20,
+        fontSize: 25,
+        marginBottom: 10
     },
-    Inputtext: {
+    inputNumber: {
         flexDirection: 'row',
-        borderColor: 'gray',
-        backgroundColor: 'transparent',
-        borderWidth: 2,
-        borderRadius: 20,
-        paddingHorizontal: 40,
-        paddingBottom: 5,
-        marginBottom: 5
+        borderBottomColor: '#DDDDDD',
+        borderBottomWidth: 1,
     },
-    image: {
-        height: 20,
-        width: 20,
-        position: 'absolute',
-        left: 15,
-        top: 12
+    error: {
+        flexDirection: 'row',
+        borderBottomColor: 'red',
+        borderBottomWidth: 1,
     },
-    icon: {
-        height: 30,
-        width: 20,
-        position: 'absolute',
-        right: 15,
-        top: 7
+    flag: {
+        height: 25,
+        width: 30,
+        marginTop: 10
     },
-    button: {
-        width: '100%',
-        borderColor: 'gray',
-        backgroundColor: 'transparent',
-        borderWidth: 2,
-        borderRadius: 19,
-        padding: 7,
-
+    submit: {
+        height: 40,
+        width: 40
     },
-    forgot: {
-        paddingHorizontal: 20,
-        fontFamily: 'sans-serif-medium',
-        fontSize: 15,
-        color: 'blue'
+    result: {
+        color: 'red',
+        fontSize: 15
     }
-});
+})

@@ -3,8 +3,8 @@ import { StyleSheet, StatusBar, Text, View, Image, TextInput, ScrollView } from 
 import SafeAreaView, { SafeAreaProvider } from 'react-native-safe-area-view';
 import Images from '../assets/index'
 import Message from '../components/Message'
-// import database from '@react-native-firebase/database';
-import { db } from '../Config/Config'
+import database from '@react-native-firebase/database';
+// import { db } from '../Config/Config'
 const Chat = ({ route, navigation }) => {
     const [message, setText] = useState('')
     const [send, setSend] = useState(false)
@@ -13,7 +13,7 @@ const Chat = ({ route, navigation }) => {
     const [num, setNum] = useState()
 
     useEffect(() => {
-        db
+        database()
             .ref(`/${name}`)
             .once('value')
             .then(snapshot => {
@@ -26,7 +26,7 @@ const Chat = ({ route, navigation }) => {
             });
     }, [])
     useEffect(() => {
-        db
+        database()
             .ref(`/${name}`)
             .once('value')
             .then(snapshot => {
@@ -41,7 +41,7 @@ const Chat = ({ route, navigation }) => {
             })
     }, [])
     const handleSubmit = e => {
-        db
+        database()
             .ref(`/${name}/${num}`)
             .set({
                 id: num,

@@ -1,19 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, Image, TextInput } from 'react-native';
-
+import auth from '@react-native-firebase/auth'
 import Images from '../assets/index'
+import database from '@react-native-firebase/database';
 
 export default function Signup({ navigation }) {
     const [name, setName] = useState('')
     const [result, setResult] = useState('')
+    const [user, setUser] = useState();
     const handleSubmit = () => {
         if (name == "") {
             setResult("required")
         }
         else {
-            navigation.navigate('Contacts')
+            navigation.navigate('Contacts', { sender: name })
         }
     }
+    function onAuthStateChanged(user) {
+        setUser(user);
+    }
+
+    useEffect(() => {
+        const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+        return subscriber;
+    }, []);
+
+
+
+    console.log(user)
     return (
         <View style={styles.container}>
 

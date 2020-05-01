@@ -10,11 +10,11 @@ import {
 import Images from '../assets/index'
 
 import { DATA } from '../DummyData/ContactList'
-function Item({ name, navigation }) {
+function Item({ name, sender, navigation }) {
     return (
         <TouchableOpacity
             style={styles.item}
-            onPress={() => navigation.navigate('Chat', { name: name })}
+            onPress={() => navigation.navigate('Chat', { name: name, sender: sender })}
         >
             <Image style={styles.itemView} source={Images.person} />
             <Text style={styles.title}>{name}</Text>
@@ -22,7 +22,7 @@ function Item({ name, navigation }) {
     );
 }
 
-export default function ContactFlatList({ navigation }) {
+export default function ContactFlatList({ sender, navigation }) {
     return (
         <SafeAreaView style={styles.container}>
             <FlatList
@@ -30,6 +30,7 @@ export default function ContactFlatList({ navigation }) {
                 renderItem={({ item }) => (
                     <Item
                         name={item.name}
+                        sender={sender}
                         navigation={navigation}
                     />
                 )}

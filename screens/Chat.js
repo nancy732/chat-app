@@ -10,11 +10,13 @@ const Chat = ({ route, navigation }) => {
     const [send, setSend] = useState(false)
     const [Messages, setMessages] = useState([])
     const { name } = route.params
+    const { sender } = route.params.sender
     const [num, setNum] = useState()
 
+    console.log(sender, name)
     useEffect(() => {
         database()
-            .ref(`/${name}`)
+            .ref(`/${sender}/${name}`)
             .once('value')
             .then(snapshot => {
                 if (snapshot.val() != null) {
@@ -24,10 +26,11 @@ const Chat = ({ route, navigation }) => {
                     setNum('1')
                 }
             });
-    }, [])
+    }, [message])
+
     useEffect(() => {
         database()
-            .ref(`/${name}`)
+            .ref(`/${sender}/${name}`)
             .once('value')
             .then(snapshot => {
                 if (snapshot.val() !== null) {
@@ -40,12 +43,24 @@ const Chat = ({ route, navigation }) => {
                 }
             })
     }, [])
+
     const handleSubmit = e => {
         database()
-            .ref(`/${name}/${num}`)
+            .ref(`/${sender}/${name}/${num}`)
             .set({
                 id: num,
                 message: message,
+                status: "send",
+                time: new Date().toLocaleTimeString()
+            })
+            .then(() => console.log('Data updated.'));
+
+        database()
+            .ref(`/${name}/${sender}/${num}`)
+            .set({
+                id: num,
+                message: message,
+                status: "received",
                 time: new Date().toLocaleTimeString()
             })
             .then(() => console.log('Data updated.'));
@@ -119,7 +134,6 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 75,
         bottom: 60,
-        paddingLeft: 200,
     },
     contactName: {
         color: 'white',

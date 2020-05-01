@@ -5,9 +5,9 @@ import {
 } from 'react-native';
 
 import Images from '../assets/index'
-function Item({ name, time }) {
+function Item({ name, time, status }) {
     return (
-        <View style={styles.container}>
+        <View style={{ ...styles.container, marginLeft: status ? 200 : 10, backgroundColor: status ? '#ddddff' : '#228B22' }}>
             <Text style={styles.message}>{name}</Text>
             <Text style={styles.time}>{time}</Text>
             <Image style={styles.image} source={Images.tick} />
@@ -16,7 +16,6 @@ function Item({ name, time }) {
 }
 
 export default function Message(props) {
-    console.log(props.message)
     const DATA = props.message
     return (
         <SafeAreaView style={{ flex: 1 }}>
@@ -27,6 +26,7 @@ export default function Message(props) {
                     <Item
                         name={item.message}
                         time={item.time}
+                        status={item.status == "send" ? true : false}
                     />
                 )}
                 keyExtractor={item => item.id}
@@ -38,7 +38,6 @@ export default function Message(props) {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#ddddff',
         padding: 8,
         width: 150,
         borderRadius: 20,

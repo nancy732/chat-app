@@ -1,8 +1,7 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { StyleSheet, View, Text, Image, TextInput, Modal, TouchableHighlight } from 'react-native';
+import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import { StyleSheet, View, Text, Image, TextInput, Modal, TouchableOpacity, TouchableHighlight } from 'react-native';
 // import { Auth } from '../Config/Config'
 import auth from '@react-native-firebase/auth';
-
 import Images from '../assets/index'
 export default function Login({ navigation }) {
 
@@ -10,7 +9,7 @@ export default function Login({ navigation }) {
     const [confirm, setConfirm] = useState(null)
     const [code, setCode] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
-    const [resendModal, setVisible] = useState(false)
+    const [resendModal, setVisible] = useState(true)
     const [sendingOTP, setSendingOTP] = useState(false);
     const [timeLeft, setTimeLeft] = useState(30);
     const [verifyingOTP, setVerifyingOTP] = useState(false);
@@ -43,6 +42,7 @@ export default function Login({ navigation }) {
                 const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
                 startTimer();
                 setConfirm(confirmation);
+                console.log(confirmation)
             }
         },
         [startTimer],
@@ -56,6 +56,7 @@ export default function Login({ navigation }) {
             try {
                 await confirm.confirm(code)
                 if (modalVisible == false) {
+                    setVisible(false)
                     navigation.navigate('Signup')
                 }
             } catch (error) {
@@ -116,28 +117,32 @@ export default function Login({ navigation }) {
                     </View>
                 </View>
             </Modal>
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={resendModal}
-            >
-                <View style={styles.centeredView}>
-                    <View style={styles.modalView}>
-                        <Text style={{ textAlign: 'center' }}>Alert</Text>
-                        <Text style={styles.modalText}>OTP Expired</Text>
+            {timeLeft >= 1 ?
+                <Text style={styles.timer}>{timeLeft}</Text> :
 
-                        <TouchableHighlight
-                            style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
-                            onPress={() => {
-                                startTimer()
-                                setVisible(false)
-                            }}
-                        >
-                            <Text style={styles.textStyle}>Resend OTP</Text>
-                        </TouchableHighlight>
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={true && resendModal}
+                >
+                    <View style={styles.centeredView}>
+                        <View style={styles.modalView}>
+                            <Text style={{ textAlign: 'center' }}>Alert</Text>
+                            <Text style={styles.modalText}>OTP Expired</Text>
+
+                            <TouchableHighlight
+                                style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
+                                onPress={() => {
+                                    handleSubmit('+91' + PhoneNumber);
+                                    setTimeLeft(30);
+                                }}
+                            >
+                                <Text style={styles.textStyle}>Resend OTP</Text>
+                            </TouchableHighlight>
+                        </View>
                     </View>
-                </View>
-            </Modal>
+                </Modal>
+            }
             <View style={styles.imageContainer}>
                 <Image style={styles.image} source={Images.login} />
             </View>
@@ -147,7 +152,6 @@ export default function Login({ navigation }) {
                 <Text>Please enter verification code sent to</Text>
                 <Text>your number</Text>
 
-                <Text style={styles.timer}>{timeLeft}</Text>
                 <Text style={styles.otpsubmit} onPress={() => {
                     setVerifyingOTP(true);
                     confirmCode()
@@ -157,6 +161,17 @@ export default function Login({ navigation }) {
 
                 <TextInput style={styles.inputOTP} onChangeText={text => { setCode(text) }} />
 
+                <Text
+                    style={styles.changeNumber}
+                    onPress={() => {
+                        setConfirm();
+                        setSendingOTP(false);
+                        setTimeLeft(30);
+                        setPhoneNumber('');
+                        setVerifyingOTP(false);
+                        setCode();
+                    }}
+                >CHANGE YOUR MOBILE NUMBER</Text>
             </View>
         </View>
     )
@@ -257,15 +272,12 @@ const styles = StyleSheet.create({
     },
     timer: {
         position: 'absolute',
-        top: 70,
-        left: 70,
-        marginTop: 15,
-        borderRadius: 20,
-        borderWidth: 2,
-        borderColor: 'gray',
+        top: 15,
+        left: 15,
         fontWeight: 'bold',
-        paddingHorizontal: 8,
-        paddingVertical: 6,
-        textAlign: 'center'
+        fontSize: 25
+    },
+    changeNumber: {
+        marginTop: 15
     }
 })

@@ -3,7 +3,7 @@ import { StyleSheet, StatusBar, Text, View, Image } from 'react-native';
 import SafeAreaView, { SafeAreaProvider } from 'react-native-safe-area-view';
 import Images from '../assets/index'
 import ContactFlatList from '../components/ContactFlatList'
-const Contacts = ({ navigation }) => {
+const Contacts = ({ route, navigation }) => {
 
     return (
         <>
@@ -15,7 +15,7 @@ const Contacts = ({ navigation }) => {
                         <Image style={styles.image} source={Images.search} />
                     </View>
                     <View style={styles.contacts}>
-                        <ContactFlatList navigation={navigation} />
+                        <ContactFlatList navigation={navigation} sender={route.params} />
                     </View>
                 </SafeAreaView>
             </SafeAreaProvider>

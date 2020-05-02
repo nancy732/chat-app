@@ -16,6 +16,7 @@ function Item({ name, time, status }) {
 }
 
 export default function Message(props) {
+    console.log(props.message)
     const DATA = props.message
     return (
         <SafeAreaView style={{ flex: 1 }}>

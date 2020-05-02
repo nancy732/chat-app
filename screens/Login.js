@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
-import { StyleSheet, View, Text, Image, TextInput, Modal, TouchableOpacity, TouchableHighlight } from 'react-native';
+import { StyleSheet, View, Text, Image, TextInput, Modal, KeyboardAvoidingView, TouchableHighlight } from 'react-native';
 // import { Auth } from '../Config/Config'
 import auth from '@react-native-firebase/auth';
 import Images from '../assets/index'
@@ -97,7 +97,7 @@ export default function Login({ navigation }) {
         )
     }
     return (
-        <View style={styles.container}>
+        <KeyboardAvoidingView style={styles.container}>
             <Modal
                 animationType="slide"
                 transparent={true}
@@ -173,7 +173,7 @@ export default function Login({ navigation }) {
                     }}
                 >CHANGE YOUR MOBILE NUMBER</Text>
             </View>
-        </View>
+        </KeyboardAvoidingView>
     )
 }
 const styles = StyleSheet.create({

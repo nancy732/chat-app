@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 import Images from '../assets/index'
 
-import { DATA } from '../DummyData/ContactList'
 function Item({ name, sender, navigation }) {
     return (
         <TouchableOpacity
@@ -22,11 +21,11 @@ function Item({ name, sender, navigation }) {
     );
 }
 
-export default function ContactFlatList({ sender, navigation }) {
+export default function ContactFlatList({ sender, Users, navigation }) {
     return (
         <SafeAreaView style={styles.container}>
             <FlatList
-                data={DATA}
+                data={Users}
                 renderItem={({ item }) => (
                     <Item
                         name={item.name}

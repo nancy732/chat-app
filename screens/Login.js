@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
-import { StyleSheet, View, Text, Image, TextInput, Modal, KeyboardAvoidingView, TouchableHighlight } from 'react-native';
+import { StyleSheet, View, Text, Image, TextInput, Animated, Keyboard, Modal, KeyboardAvoidingView, TouchableHighlight } from 'react-native';
 // import { Auth } from '../Config/Config'
 import auth from '@react-native-firebase/auth';
 import Images from '../assets/index'
@@ -14,6 +14,7 @@ export default function Login({ navigation }) {
     const [timeLeft, setTimeLeft] = useState(30);
     const [verifyingOTP, setVerifyingOTP] = useState(false);
     const [result, setResult] = useState('')
+    const [imageHeight, setHeight] = useState(250)
     const intervalRef = useRef(null);
     const startTimer = useCallback(() => {
         intervalRef.current = setInterval(() => {
@@ -42,7 +43,6 @@ export default function Login({ navigation }) {
                 const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
                 startTimer();
                 setConfirm(confirmation);
-                console.log(confirmation)
             }
         },
         [startTimer],
@@ -61,17 +61,32 @@ export default function Login({ navigation }) {
                 }
             } catch (error) {
                 setModalVisible(true);
-                console.log('Invalid code.');
             }
         }
     }
 
+    useEffect(() => {
+        keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', _keyboardDidShow);
+        keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', _keyboardDidHide);
+    })
+
+
+    _keyboardDidShow = () => {
+        setHeight(150)
+    }
+
+    _keyboardDidHide = () => {
+        setHeight(250)
+    }
     if (!confirm) {
         return (
-            <View style={styles.container}>
+            <KeyboardAvoidingView
+                behavior='height'
+                style={styles.container}
+            >
 
                 <View style={styles.imageContainer}>
-                    <Image style={styles.image} source={Images.login} />
+                    <Image style={{ height: imageHeight, width: imageHeight }} source={Images.login} />
                 </View>
                 <View style={styles.textContainer}>
                     <Text style={styles.text}>Get start with Phone Number</Text>
@@ -93,11 +108,14 @@ export default function Login({ navigation }) {
                     </View>
                     <Text style={styles.result}>{result}</Text>
                 </View>
-            </View>
+            </KeyboardAvoidingView>
         )
     }
     return (
-        <KeyboardAvoidingView style={styles.container}>
+        <KeyboardAvoidingView
+            behavior='height'
+            style={styles.container}
+        >
             <Modal
                 animationType="slide"
                 transparent={true}
@@ -144,7 +162,7 @@ export default function Login({ navigation }) {
                 </Modal>
             }
             <View style={styles.imageContainer}>
-                <Image style={styles.image} source={Images.login} />
+                <Image style={{ height: imageHeight, width: imageHeight }} source={Images.login} />
             </View>
 
             <View style={styles.textContainer}>
@@ -188,11 +206,13 @@ const styles = StyleSheet.create({
     },
     imageContainer: {
         flex: 1,
+        paddingTop: 40,
         alignItems: "center",
         justifyContent: "center"
     },
     textContainer: {
         flex: 2,
+        paddingTop: 20,
         alignItems: 'center',
         justifyContent: "flex-start",
     },
@@ -227,7 +247,7 @@ const styles = StyleSheet.create({
     },
     otpsubmit: {
         position: 'absolute',
-        top: 80,
+        top: 100,
         right: 70,
         height: 40,
         width: 40
@@ -272,7 +292,7 @@ const styles = StyleSheet.create({
     },
     timer: {
         position: 'absolute',
-        top: 15,
+        top: 35,
         left: 15,
         fontWeight: 'bold',
         fontSize: 25

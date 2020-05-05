@@ -8,23 +8,67 @@ export default function Signup({ navigation }) {
     const [name, setName] = useState('')
     const [result, setResult] = useState('')
     const [user, setUser] = useState();
+    const [num, setNum] = useState()
+    const [store, setStore] = useState(true)
+    useEffect(() => {
+        database()
+            .ref(`/users`)
+            .once('value')
+            .then(snapshot => {
+                if (snapshot.val() != null) {
+                    setNum(snapshot.val().length)
+                }
+                else {
+                    setNum('1')
+                }
+            });
+    }, [name])
+
+    useEffect(() => {
+        database()
+            .ref(`/users`)
+            .once('value')
+            .then(snapshot => {
+                console.log(snapshot.val())
+                snapshot.val().map(value => {
+                    if (value != null) {
+                        if (value.user == user) {
+                            setStore(false)
+                        }
+                    }
+                })
+
+            });
+    }, [name])
+
     const handleSubmit = () => {
         if (name == "") {
             setResult("required")
         }
         else {
-            navigation.navigate('Contacts', { sender: name })
+            if (store) {
+                database()
+                    .ref(`/users/${num}`)
+
+                    .set({
+                        id: num,
+                        name: name,
+                        user: user
+                    })
+                    .then(() => console.log('Data updated.'));
+            }
+            navigation.navigate('Contacts', { name: name })
         }
     }
+
     function onAuthStateChanged(user) {
-        setUser(user);
+        setUser(user.phoneNumber);
     }
 
     useEffect(() => {
         const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
         return subscriber;
     }, []);
-
 
 
     console.log(user)

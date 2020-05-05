@@ -11,7 +11,6 @@ const AppNavigator = () => {
         <Stack.Navigator initialRouteNmae="Login" headerMode="none">
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="Signup" component={Signup} />
-
             <Stack.Screen name="Contacts" component={Contacts} />
             <Stack.Screen name="Chat" component={Chat} />
         </Stack.Navigator>

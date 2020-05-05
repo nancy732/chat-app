@@ -10,5 +10,6 @@ export default {
     lock: require('./Images/lock.png'),
     login: require('./Images/login.jpg'),
     india: require('./Images/india.png'),
-    checked: require('./Images/checked.png')
+    checked: require('./Images/checked.png'),
+    emoji: require('./Images/anime-emoji.png')
 };

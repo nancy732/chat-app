@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
-import { StyleSheet, View, Text, Image, TextInput, Animated, Keyboard, Modal, KeyboardAvoidingView, TouchableHighlight } from 'react-native';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { StyleSheet, View, Text, Image, TextInput, TouchableOpacity, Keyboard, Modal, KeyboardAvoidingView, TouchableHighlight } from 'react-native';
 // import { Auth } from '../Config/Config'
 import auth from '@react-native-firebase/auth';
 import Images from '../assets/index'
@@ -99,12 +99,12 @@ export default function Login({ navigation }) {
                             setResult('')
                             setPhoneNumber(text)
                         }} />
-                        <Text style={styles.submit} onPress={() => {
+                        <TouchableOpacity style={styles.submit} onPress={() => {
                             handleSubmit('+91' + PhoneNumber)
                             setSendingOTP(true);
                         }}>
                             <Image style={{ height: 30, width: 30 }} source={Images.tick} />
-                        </Text>
+                        </TouchableOpacity>
                     </View>
                     <Text style={styles.result}>{result}</Text>
                 </View>
@@ -170,12 +170,12 @@ export default function Login({ navigation }) {
                 <Text>Please enter verification code sent to</Text>
                 <Text>your number</Text>
 
-                <Text style={styles.otpsubmit} onPress={() => {
+                <TouchableOpacity style={styles.otpsubmit} onPress={() => {
                     setVerifyingOTP(true);
                     confirmCode()
                 }}>
                     <Image style={{ height: 30, width: 30 }} source={Images.tick} />
-                </Text>
+                </TouchableOpacity>
 
                 <TextInput style={styles.inputOTP} onChangeText={text => { setCode(text) }} />
 
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
         justifyContent: "flex-start",
     },
     text: {
-        fontSize: 25,
+        fontSize: 20,
         marginBottom: 10
     },
     inputNumber: {
@@ -243,11 +243,12 @@ const styles = StyleSheet.create({
     },
     submit: {
         height: 40,
-        width: 40
+        width: 40,
+        marginTop: 15
     },
     otpsubmit: {
         position: 'absolute',
-        top: 100,
+        top: 120,
         right: 70,
         height: 40,
         width: 40

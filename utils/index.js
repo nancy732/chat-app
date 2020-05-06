@@ -16,3 +16,4 @@ export const uploadFileToFireBase = imagePickerResponse => {
     const storageRef = createStorageReferenceToFile(imagePickerResponse);
     return storageRef.putFile(fileSource);
 };
+export const uploadProgress = ratio => Math.round(ratio * 100);

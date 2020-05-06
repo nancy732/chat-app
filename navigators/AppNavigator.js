@@ -1,6 +1,6 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
-import Contacts from '../screens/Contacts'
+import Contacts from '../screens/ContactList'
 import Chat from '../screens/Chat'
 import Login from '../screens/Login'
 import Signup from '../screens/Signup';

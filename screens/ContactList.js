@@ -4,12 +4,13 @@ import SafeAreaView, { SafeAreaProvider } from 'react-native-safe-area-view';
 import Images from '../assets/index'
 import ContactFlatList from '../components/ContactFlatList'
 import database from '@react-native-firebase/database';
-
 const Contacts = ({ route, navigation }) => {
 
     const [Users, setUsers] = useState([])
     const [send, setSend] = useState(true)
     const sender = route.params.name
+
+
     useEffect(() => {
         database()
             .ref(`/users`)

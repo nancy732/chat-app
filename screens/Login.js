@@ -35,7 +35,9 @@ export default function Login({ navigation }) {
     }
 
     const handleSubmit = useCallback(
+
         async phoneNumber => {
+
             if (validatePhoneNumber(phoneNumber) == '') {
                 setResult('Enter valid Phone Number')
             }

@@ -12,7 +12,9 @@ const Chat = ({ route, navigation }) => {
     const [send, setSend] = useState(false)
     const [Messages, setMessages] = useState([])
     const { name } = route.params
+    const receiver = route.params.uid
     const { sender } = route.params
+    const { senderName } = route.params
     const [num, setNum] = useState()
     const [Height, setHeight] = useState({
         flexHeight: 8,
@@ -27,34 +29,50 @@ const Chat = ({ route, navigation }) => {
     const [imageURI, setImageURI] = useState(null);
     const [justify, setJustify] = useState('center')
 
+
     useEffect(() => {
         database()
-            .ref(`/${sender}/${name}`)
+            .ref(`/${sender}/${receiver}`)
             .once('value')
             .then(snapshot => {
                 if (snapshot.val() != null) {
                     setNum(snapshot.val().length)
-                }
-                else {
-                    setNum('1')
                 }
             });
     }, [message])
 
     useEffect(() => {
         database()
-            .ref(`/${sender}/${name}`)
+            .ref(`/${sender}/${receiver}`)
             .once('value')
             .then(snapshot => {
                 if (snapshot.val() !== null) {
-                    snapshot.val().map(value => {
-                        if (value != null) {
+                    snapshot.val().map((value, index) => {
+                        console.log(index)
+                        if (value != null && index != 1) {
                             Messages.push(value)
                             setSend(true)
                         }
                     })
                 }
             })
+    }, [])
+    useEffect(() => {
+        database()
+            .ref(`/${sender}/${receiver}/1`)
+            .set({
+                name: name,
+                uid: receiver,
+            })
+            .then(() => console.log('Data updated.'));
+
+        database()
+            .ref(`/${receiver}/${sender}/1`)
+            .set({
+                name: senderName,
+                uid: sender
+            })
+            .then(() => console.log('Data updated.'));
     }, [])
 
     useEffect(() => {
@@ -90,7 +108,7 @@ const Chat = ({ route, navigation }) => {
     const handleSubmit = e => {
         if (message !== '' || imageURI !== null) {
             database()
-                .ref(`/${sender}/${name}/${num}`)
+                .ref(`/${sender}/${receiver}/${num}`)
                 .set({
                     id: num,
                     message: message,
@@ -101,7 +119,7 @@ const Chat = ({ route, navigation }) => {
                 .then(() => console.log('Data updated.'));
 
             database()
-                .ref(`/${name}/${sender}/${num}`)
+                .ref(`/${receiver}/${sender}/${num}`)
                 .set({
                     id: num,
                     message: message,
@@ -118,6 +136,7 @@ const Chat = ({ route, navigation }) => {
                 time: new Date().toLocaleTimeString()
             })
             setText('')
+            setImageURI(null)
             setShow(false)
         }
     }

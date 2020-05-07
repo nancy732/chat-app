@@ -7,7 +7,10 @@ import database from '@react-native-firebase/database';
 export default function Signup({ navigation }) {
     const [name, setName] = useState('')
     const [result, setResult] = useState('')
-    const [user, setUser] = useState();
+    const [user, setUser] = useState({
+        uid: '',
+        phoneNumber: ''
+    });
     const [num, setNum] = useState()
     const [store, setStore] = useState(true)
     useEffect(() => {
@@ -32,7 +35,7 @@ export default function Signup({ navigation }) {
                 console.log(snapshot.val())
                 snapshot.val().map(value => {
                     if (value != null) {
-                        if (value.user == user) {
+                        if (value.phoneNumber == user.phoneNumber) {
                             setStore(false)
                         }
                     }
@@ -52,17 +55,22 @@ export default function Signup({ navigation }) {
 
                     .set({
                         id: num,
+                        uid: user.uid,
                         name: name,
-                        user: user
+                        phoneNumber: user.phoneNumber
                     })
                     .then(() => console.log('Data updated.'));
             }
-            navigation.navigate('Contacts', { name: name })
+            navigation.navigate('Messages', { name: name, uid: user.uid })
         }
     }
 
     function onAuthStateChanged(user) {
-        setUser(user.phoneNumber);
+        setUser({
+            ...user,
+            uid: user.uid,
+            phoneNumber: user.phoneNumber
+        });
     }
 
     useEffect(() => {

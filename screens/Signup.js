@@ -32,7 +32,6 @@ export default function Signup({ navigation }) {
             .ref(`/users`)
             .once('value')
             .then(snapshot => {
-                console.log(snapshot.val())
                 snapshot.val().map(value => {
                     if (value != null) {
                         if (value.phoneNumber == user.phoneNumber) {
@@ -44,6 +43,7 @@ export default function Signup({ navigation }) {
             });
     }, [name])
 
+    console.log(store)
     const handleSubmit = () => {
         if (name == "") {
             setResult("required")

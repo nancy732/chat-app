@@ -12,5 +12,10 @@ export default {
     india: require('./Images/india.png'),
     checked: require('./Images/checked.png'),
     emoji: require('./Images/anime-emoji.png'),
-    contacts: require('./Images/create-new.png')
+    contacts: require('./Images/create-new.png'),
+    expand: require('./Images/expand-arrow.png'),
+    add: require('./Images/add-male-user.png'),
+    about: require('./Images/about-me-male.png'),
+    forward: require('./Images/forward.png'),
+    image: require('./Images/image.png')
 };

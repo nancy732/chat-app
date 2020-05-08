@@ -18,7 +18,6 @@ const Messages = ({ route, navigation }) => {
             .then(snapshot => {
                 if (snapshot.val() !== null) {
                     const keys = Object.keys(snapshot.val()).reverse()
-                    console.log(keys)
                     keys.map(key => {
                         database()
                             .ref(`/${sender}/${key}`)
@@ -36,13 +35,19 @@ const Messages = ({ route, navigation }) => {
                     })
                 }
             })
-    }, [])
+    })
     return (
         <>
             <StatusBar hidden />
             <SafeAreaProvider>
                 <SafeAreaView style={styles.container}>
                     <View style={styles.header}>
+                        <TouchableOpacity
+                            style={styles.image}
+
+                        >
+                            <Image style={{ height: 40, width: 40 }} source={Images.about} />
+                        </TouchableOpacity>
                         <Text style={styles.text}>Chats</Text>
                         <TouchableOpacity
                             style={styles.image}
@@ -50,7 +55,7 @@ const Messages = ({ route, navigation }) => {
                                 navigation.navigate('Contacts', { senderName: senderName, sender: sender })
                             }}
                         >
-                            <Image style={{ height: 30, width: 30 }} source={Images.contacts} />
+                            <Image style={{ height: 30, width: 30, marginTop: 5 }} source={Images.contacts} />
                         </TouchableOpacity>
                     </View>
                     <View style={styles.contacts}>
@@ -69,14 +74,15 @@ const styles = StyleSheet.create({
     image: {
         height: 35,
         width: 35,
-        margin: 20,
+        margin: 15,
     },
     header: {
         flex: 1,
-        backgroundColor: 'blue',
         flexDirection: 'row',
         alignContent: 'center',
         justifyContent: 'space-between',
+        borderBottomWidth: 1,
+        borderBottomColor: '#DDDDDD'
     },
     contacts: {
         flex: 9,
@@ -84,7 +90,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     text: {
-        color: 'white',
+        color: 'black',
         fontSize: 25,
         margin: 15,
         fontWeight: 'bold'

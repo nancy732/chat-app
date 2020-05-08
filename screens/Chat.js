@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, KeyboardAvoidingView, TouchableOpacity, Keyboard, TouchableWithoutFeedback, Text, View, Image, TextInput } from 'react-native';
+import { StyleSheet, KeyboardAvoidingView, TouchableOpacity, Keyboard, Text, View, Image, TextInput } from 'react-native';
 import Images from '../assets/index'
 import Message from '../components/Message'
 import database from '@react-native-firebase/database';
@@ -19,7 +19,8 @@ const Chat = ({ route, navigation }) => {
     const [Height, setHeight] = useState({
         flexHeight: 8,
         bottom: 15,
-        top: 15
+        top: 15,
+        forward: 5
     })
     const [upload, setUpload] = useState({
         loading: false,
@@ -38,6 +39,9 @@ const Chat = ({ route, navigation }) => {
                 if (snapshot.val() != null) {
                     setNum(snapshot.val().length)
                 }
+                else {
+                    setNum(2)
+                }
             });
     }, [message])
 
@@ -46,9 +50,9 @@ const Chat = ({ route, navigation }) => {
             .ref(`/${sender}/${receiver}`)
             .once('value')
             .then(snapshot => {
+                console.log(snapshot.val())
                 if (snapshot.val() !== null) {
                     snapshot.val().map((value, index) => {
-                        console.log(index)
                         if (value != null && index != 1) {
                             Messages.push(value)
                             setSend(true)
@@ -56,23 +60,6 @@ const Chat = ({ route, navigation }) => {
                     })
                 }
             })
-    }, [])
-    useEffect(() => {
-        database()
-            .ref(`/${sender}/${receiver}/1`)
-            .set({
-                name: name,
-                uid: receiver,
-            })
-            .then(() => console.log('Data updated.'));
-
-        database()
-            .ref(`/${receiver}/${sender}/1`)
-            .set({
-                name: senderName,
-                uid: sender
-            })
-            .then(() => console.log('Data updated.'));
     }, [])
 
     useEffect(() => {
@@ -85,7 +72,6 @@ const Chat = ({ route, navigation }) => {
         }
     })
 
-
     _keyboardDidShow = () => {
         setJustify('flex-end')
         setHeight({
@@ -93,6 +79,7 @@ const Chat = ({ route, navigation }) => {
             flexHeight: 4,
             bottom: 25,
             top: 22,
+            forward: 10
         })
     }
 
@@ -102,11 +89,29 @@ const Chat = ({ route, navigation }) => {
             ...Height,
             flexHeight: 8,
             bottom: 15,
-            top: 15
+            top: 15,
+            forward: 5
         })
     }
     const handleSubmit = e => {
         if (message !== '' || imageURI !== null) {
+            if (num <= 2) {
+                database()
+                    .ref(`/${sender}/${receiver}/1`)
+                    .set({
+                        name: name,
+                        uid: receiver,
+                    })
+                    .then(() => console.log('Data updated.'));
+
+                database()
+                    .ref(`/${receiver}/${sender}/1`)
+                    .set({
+                        name: senderName,
+                        uid: sender
+                    })
+                    .then(() => console.log('Data updated.'));
+            }
             database()
                 .ref(`/${sender}/${receiver}/${num}`)
                 .set({
@@ -171,13 +176,8 @@ const Chat = ({ route, navigation }) => {
             } else if (response.error) {
                 console.log('An error occurred: ', response.error);
             } else {
-                // setImageURI({ uri: response.uri });
-                // console.log(createStorageReferenceToFile(response));
-                // Promise.resolve(uploadFileToFireBase(response));
-
                 const uploadTask = uploadFileToFireBase(response);
                 monitorFileUpload(uploadTask);
-
             }
         }
         );
@@ -222,7 +222,13 @@ const Chat = ({ route, navigation }) => {
             >
                 <Image style={{ ...styles.profileIcon, marginTop: Height.bottom }} source={Images.person} />
                 <Text style={{ ...styles.contactName, marginTop: Height.top }}>{name}</Text>
-
+                <Text style={{ position: 'absolute', right: 10, height: 50, marginTop: Height.forward }}
+                    onPress={() => {
+                        navigation.navigate('Messages')
+                    }}
+                >
+                    <Image style={styles.forward} source={Images.forward} />
+                </Text>
             </View>
             <View
                 onPress={Keyboard.dismiss}
@@ -230,9 +236,9 @@ const Chat = ({ route, navigation }) => {
             >
                 <Message message={Messages} />
             </View>
-            <View style={{ flex: 1, flexDirection: 'row' }}>
+            <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
                 <TextInput
-                    placeholder="Enter Text"
+                    placeholder="Chat"
                     name="chat"
                     value={message}
 
@@ -240,11 +246,15 @@ const Chat = ({ route, navigation }) => {
                         setSend(false)
                         setText(text)
                     }}
-                    style={{ marginLeft: 40, backgroundColor: 'white', width: '80%', paddingLeft: 10 }}
+                    style={styles.footer}
                 />
-                <Text onPress={uploadFile} style={styles.Text}>+</Text>
                 <TouchableOpacity
-                    style={{ position: 'absolute', bottom: 25, right: 2 }}
+                    style={{ marginLeft: 10 }}
+                    onPress={uploadFile}>
+                    <Image style={styles.send} source={Images.image} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={{ marginLeft: 10 }}
                     onPress={handleSubmit}>
                     <Image style={styles.send} source={Images.send} />
                 </TouchableOpacity>
@@ -262,9 +272,10 @@ const styles = StyleSheet.create({
     },
     header: {
         flex: 1,
-        backgroundColor: "blue",
         flexDirection: 'row',
         justifyContent: 'flex-start',
+        borderBottomColor: '#DDDDDD',
+        borderBottomWidth: 1
     },
     profileIcon: {
         height: 40,
@@ -276,20 +287,33 @@ const styles = StyleSheet.create({
         backgroundColor: 'white'
     },
     contactName: {
-        color: 'white',
+        color: 'black',
         fontSize: 25,
         margin: 15,
     },
     send: {
-        width: 30,
-        height: 30,
+        width: 35,
+        height: 35,
     },
     Text: {
-        color: 'blue',
-        fontSize: 30,
-        position: 'absolute',
-        bottom: 18,
-        left: 12
+        marginLeft: 15,
+        height: 40,
+        width: 40,
+        marginBottom: 5
+    },
+    forward: {
+        height: 40,
+        width: 40,
+    },
+    footer: {
+        backgroundColor: '#EEEEEE',
+        borderColor: '#DDDDDD',
+        borderWidth: 1,
+        borderRadius: 20,
+        width: '70%',
+        paddingLeft: 20,
+        height: '70%',
+        marginLeft: 10,
     }
 });
 

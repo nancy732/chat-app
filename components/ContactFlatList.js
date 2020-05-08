@@ -51,20 +51,21 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         marginHorizontal: 10,
         marginTop: 15,
+        borderBottomColor: '#DDDDDD',
+        borderBottomWidth: 1
     },
     title: {
         fontSize: 20,
         width: '85%',
         marginTop: 5,
         marginHorizontal: 10,
-        borderBottomColor: 'gray',
-        borderBottomWidth: 1
+
     },
     itemView: {
         height: 40,
         width: 40,
         padding: 20,
-        borderColor: 'gray',
+        borderColor: '#DDDDDD',
         borderWidth: 1,
         borderRadius: 20,
     }
